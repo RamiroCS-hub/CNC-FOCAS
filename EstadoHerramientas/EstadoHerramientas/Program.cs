@@ -50,98 +50,58 @@ namespace FanucFocasTutorial1
                 Console.WriteLine($"\n\nPart Count is: {partcount}\n\n");*/
 
                 //Ejecuta la función para descargar un NC al CNC
-                string downloadOrNot = downloadToCNC();
-                Console.WriteLine(downloadOrNot);
-
-                // Initialize your Fanuc class here if needed
-                /*var _fanuc = new Fanuc();
-                string prg_name = GetProgramName();
-                Console.Write($"\n\nProgram Name: {prg_name}");
-                short _programNumber = 182 ;
-                string prg_comment = GetProgramComment(_programNumber);
-                Console.Write($"\n\nProgram Comment: {prg_comment}");*/
+                short toolGroup = 1; //Cambiar por el numero del grupo de herramienta que se quiere leer
+                short toolNumb = 1; //Cambiar por el numero de la herramienta que sse quiere leer
+                GetToolLenght(toolGroup, toolNumb);
+                Console.WriteLine(downloadOrNot)
         
             }
         }
-        public static string downloadToCNC() {
-            if (_handle == 0)
-            {
-                Console.WriteLine("Error: Handle do not exist");
-                return "";
-            }
 
-            short typeOfData = 0;
-            /* typeOfData puede ser:
-                0:NC program
-                1:Tool offset data
-                2:Parameter
-                3:Pitch error compensation data
-                4:custom macro variables
-                5:Work zero offset data
-                18:Rotary table dynamic fixture offset
-            */
-            unsafe
-            { 
-
-                //En este caso program es un programa NC, pero puede cambiar dependiendo de lo que queremos descargar
-                string program =
-                        "\n" +
-                        "<PROG123>\n" +
-                        "M3 S1200\n" +
-                        "G0 Z0\n" +
-                        "G0 X0 Y0\n" +
-                        "G1 F500 X120. Y-30.\n" +
-                        "M30\n" +
-                        "%";
-
-                len = program.Length;
-
-                _ret = Focas1.cnc_dwnstart4(_handle, typeOfData, "//CNC_MEM/USER/PATH1");
-
-                if (_ret != Focas1.EW_OK)
-                {
-                    return $"Error,the return was: {_ret}";
-                }
-
-                while (len > 0)
-                {
-                    char[] downProgram = new char[1024]; // 1460 - El máximo para ethernet; 1024-1400 - Recomendado
-                    program.CopyTo(startPos, downProgram, 0, len);
-
-                    fileLen = len;
-
-                    _ret = Focas1.cnc_download4(_handle, ref fileLen, downProgram); //Al pasar fileLen como ref la función nos la va a modificar con la cantidad de bytes que se descargaron
-
-                    if (_ret == (short)Focas1.focas_ret.EW_BUFFER)
-                    { //No se pudo descargar ni 1 solo byte, se empieza el loop de nuevo
-                        continue;
-                    }
-                    if (_ret == Focas1.EW_OK)
-                    {
-                        startPos += fileLen;
-                        len -= fileLen; //Si se descargo todo len = 0 y va a terminar el loop. Sino se va a repetir y va a descargar lo que falta
-                        if (len == 0)
-                        {
-                            messg = "Succes: All files were successfully downloaded";
-                        }
-                    }
-                    else
-                    {
-                        messg = "Error: Cannot download all the files";
-                        break;
-                    }
-                }
-            }
+        public static string GetToolLenght(short toolGroup, short toolNumb) {
+            Focas1.cnc_rd1length(_handle, toolGroup, toolNumb).data;
+            string connectionString = "server=(local)\SQLExpress;database=Northwind;integrated Security=SSPI;";
             
-            _ret = Focas1.cnc_dwnend4(_handle); // Termino la descargaa y chequeo que todo haya salido bien
-            if( _ret != Focas1.EW_OK)
-            {
-                return $"{messg}, the error was: {_ret}";
-            }
-            return $"{messg}. {_ret}";
-
+            string query = "SELECT TOP 5 * FROM dbo.Customers ORDER BY CustomerID";
+            databaseQuery(connectionString, query);
+            
         }
-        private static void ExitCheck()
+
+        private static databaseQuery(string connection, string query)
+        {
+            using (SqlConnection _con = new SqlConnection(connection))
+                
+                using (SqlCommand _cmd = new SqlCommand(query, _con))
+                {
+                    DataTable customerTable = new DataTable("Top5Customers");
+
+                    SqlDataAdapter _dap = new SqlDataAdapter(_cmd);
+
+                    _con.Open();
+                    _dap.Fill(customerTable);
+                    _con.Close();
+
+                }
+            }
+        /*string query = @"
+CREATE TABLE MiTabla (
+    Columna1 INT PRIMARY KEY,
+    Columna2 VARCHAR(255) NOT NULL,
+    Columna3 DATE
+);";
+        private static void databaseQuery(string connection, string query)
+{
+    using (SqlConnection _con = new SqlConnection(connection))
+    using (SqlCommand _cmd = new SqlCommand(query, _con))
+    {
+        _con.Open();
+        _cmd.ExecuteNonQuery();
+        _con.Close();
+    }
+}*/
+    }
+
+    private static void ExitCheck()
         {
             while (Console.ReadLine() != "exit")
             {
@@ -150,34 +110,6 @@ namespace FanucFocasTutorial1
 
             _exit = true;
         }
-
-        /*
-        public static bool GetOpSignal()
-        {
-            if (_handle == 0)
-            {
-                Console.WriteLine("Error: Please obtain a handle before calling this method");
-                return false;
-            }
-
-            short addr_kind = 1; // F
-            short data_type = 0; // Byte
-            ushort start = 0;
-            ushort end = 0;
-            ushort data_length = 9; // 8 + N
-            Focas1.IODBPMC0 pmc = new Focas1.IODBPMC0();
-
-            _ret = Focas1.pmc_rdpmcrng(_handle, addr_kind, data_type, start, end, data_length, pmc);
-
-            if (_ret != Focas1.EW_OK)
-            {
-                Console.WriteLine($"Error: Unable to ontain the OP Signal");
-                return false;
-            }
-
-            return pmc.cdata[0].GetBit(7);
-
-        }*/
 
         public static string GetMode()
         {
