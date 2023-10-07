@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
+using System.Linq.Expressions;
 
 namespace FanucFocasTutorial1
 { /*
@@ -55,8 +56,6 @@ namespace FanucFocasTutorial1
             }
             else
             {
-                
-
                 //Ejecuta la función para descargar archivos desde el CNC
                 StringBuilder file = new StringBuilder();
                 file.Append("R:\\20. Digital\\CNC");
@@ -66,17 +65,21 @@ namespace FanucFocasTutorial1
                 string downloadOrNot = downloadFromCNC(programName, filePath) ;
 
                 Console.WriteLine(downloadOrNot);
-        
             }
         }
         public static string downloadFromCNC(string programPath,string filePath)
         {
+            int lenLastWrite = 0;
+            Boolean contr = true;
+            StreamWriter sw = new StreamWriter(filePath); //Crea el archivo que va a escribir
+            short typeOfData = 0;
+
             if (_handle == 0)
             {
                 messg = ("Error: Handle do not exist");
                 return "";
             }
-            short typeOfData = 0;
+           
             /*typeOf data define que archivo se quiere descargar desde el torno:
             0:NC program
             1:Tool offset data
@@ -95,8 +98,7 @@ namespace FanucFocasTutorial1
              Ejemplo de programName: //CNC_MEM/USER/PATH1/FILE1*/
             _ret = Focas1.cnc_upstart4(_handle, typeOfData, programPath);
             if (_ret != Focas1.EW_OK) return $"Error: the _ret was:{_ret}";
-            int lenLastWrite = 0;
-            Boolean contr = true;
+           
             do
             {
                 len = BUFFSIZE;
@@ -111,10 +113,10 @@ namespace FanucFocasTutorial1
                     buff[len] = '\0'; //En la ultima posición de lo descargado se coloca '\0' señalizando el final del String leído
                     byte[] dataToWrite = Encoding.UTF8.GetBytes(new string(buff, 0, len)); // Convert char[] to bytes
 
-                    using (FileStream oFS = File.Create(filePath)) // Remove the semicolon here
-                    {
-                        oFS.Write(dataToWrite, 0, dataToWrite.Length); // Write the bytes to the file
+                    try{
+                        sw.WriteLine(dataToWrite)
                     }
+
                     lenLastWrite = len;
                 }
                 if (buff[len - 1] == '%') //Si el último caracter es '%' significa que ya leyó todo el archivo
