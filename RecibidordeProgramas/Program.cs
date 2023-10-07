@@ -96,6 +96,7 @@ namespace FanucFocasTutorial1
             _ret = Focas1.cnc_upstart4(_handle, typeOfData, programPath);
             if (_ret != Focas1.EW_OK) return $"Error: the _ret was:{_ret}";
             int lenLastWrite = 0;
+            Boolean contr = true;
             do
             {
                 len = BUFFSIZE;
@@ -118,10 +119,11 @@ namespace FanucFocasTutorial1
                 }
                 if (buff[len - 1] == '%') //Si el último caracter es '%' significa que ya leyó todo el archivo
                 {
+                    contr = false
                     break;
                 }
                 Array.Clear(buff, 0, buff.Length); //Como lo descargado ya se guardo en un archivo se borra todo y se empieza a descargar lo siguiente
-            } while ((_ret == Focas1.EW_OK) || (_ret == (short)Focas1.focas_ret.EW_BUFFER));
+            } while (contr);
 
 
             _ret = Focas1.cnc_upend4(_handle); 
