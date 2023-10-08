@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -53,7 +54,7 @@ namespace FanucFocasTutorial1
                 short toolGroup = 1; //Cambiar por el numero del grupo de herramienta que se quiere leer
                 short toolNumb = 1; //Cambiar por el numero de la herramienta que sse quiere leer
                 GetToolLenght(toolGroup, toolNumb);
-                Console.WriteLine(downloadOrNot)
+                //Console.WriteLine(downloadOrNot)
         
             }
         }
@@ -63,12 +64,30 @@ namespace FanucFocasTutorial1
             string connectionString = "server=(local)\SQLExpress;database=Northwind;integrated Security=SSPI;";
             
             string query = "SELECT TOP 5 * FROM dbo.Customers ORDER BY CustomerID";
-            databaseQuery(connectionString, query);
+            string query = @"
+            CREATE TABLE MiTabla (
+                Columna1 INT PRIMARY KEY,
+                Columna2 VARCHAR(255) NOT NULL,
+                Columna3 DATE
+            );";
+            SqlConnection _con = new SqlConnection(connectionString);
+            //databaseQuery(connectionString, query);
             
         }
 
         private static databaseQuery(string connection, string query)
         {
+            
+                    private static void databaseQuery(string connection, string query)
+            {
+                using (SqlConnection _con = new SqlConnection(connection))
+                using (SqlCommand _cmd = new SqlCommand(query, _con))
+                {
+                    _con.Open();
+                    _cmd.ExecuteNonQuery();
+                    _con.Close();
+                }
+            }
             using (SqlConnection _con = new SqlConnection(connection))
                 
                 using (SqlCommand _cmd = new SqlCommand(query, _con))
@@ -83,22 +102,7 @@ namespace FanucFocasTutorial1
 
                 }
             }
-        /*string query = @"
-CREATE TABLE MiTabla (
-    Columna1 INT PRIMARY KEY,
-    Columna2 VARCHAR(255) NOT NULL,
-    Columna3 DATE
-);";
-        private static void databaseQuery(string connection, string query)
-{
-    using (SqlConnection _con = new SqlConnection(connection))
-    using (SqlCommand _cmd = new SqlCommand(query, _con))
-    {
-        _con.Open();
-        _cmd.ExecuteNonQuery();
-        _con.Close();
-    }
-}*/
+        
     }
 
     private static void ExitCheck()

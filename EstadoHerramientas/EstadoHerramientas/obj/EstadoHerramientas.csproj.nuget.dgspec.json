@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\PC\\Desktop\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj": {}
+    "C:\\Users\\ramir\\Desktop\\Programacion\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj": {}
   },
   "projects": {
-    "C:\\Users\\PC\\Desktop\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj": {
+    "C:\\Users\\ramir\\Desktop\\Programacion\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PC\\Desktop\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj",
+        "projectUniqueName": "C:\\Users\\ramir\\Desktop\\Programacion\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj",
         "projectName": "EstadoHerramientas",
-        "projectPath": "C:\\Users\\PC\\Desktop\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj",
-        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PC\\Desktop\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas\\obj\\",
+        "projectPath": "C:\\Users\\ramir\\Desktop\\Programacion\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\EstadoHerramientas.csproj",
+        "packagesPath": "C:\\Users\\ramir\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ramir\\Desktop\\Programacion\\CNC_Focas\\EstadoHerramientas\\EstadoHerramientas\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ramir\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -39,6 +39,12 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.5, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -55,7 +61,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -6,3 +6,10 @@ C:\Autentio\Github\Autentio\Focas\RecibidordeProgramas\bin\Release\FocasReceiver
 C:\Autentio\Github\Autentio\Focas\RecibidordeProgramas\bin\Release\FocasReceiver.pdb
 C:\Autentio\Github\Autentio\Focas\RecibidordeProgramas\obj\Release\FocasReceiver.exe
 C:\Autentio\Github\Autentio\Focas\RecibidordeProgramas\obj\Release\FocasReceiver.pdb
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\bin\Release\FocasReceiver.exe.config
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\bin\Release\FocasReceiver.exe
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\bin\Release\FocasReceiver.pdb
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\Connecting.csproj.AssemblyReference.cache
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\Connecting.csproj.CoreCompileInputs.cache
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\FocasReceiver.exe
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\FocasReceiver.pdb
