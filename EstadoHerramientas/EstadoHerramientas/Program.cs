@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Focas1;
 
 namespace FanucFocasTutorial1
 {
@@ -53,57 +55,74 @@ namespace FanucFocasTutorial1
                 //Ejecuta la función para descargar un NC al CNC
                 short toolGroup = 1; //Cambiar por el numero del grupo de herramienta que se quiere leer
                 short toolNumb = 1; //Cambiar por el numero de la herramienta que sse quiere leer
-                GetToolLenght(toolGroup, toolNumb);
-                //Console.WriteLine(downloadOrNot)
+                string response = GetToolLenght(toolGroup, toolNumb);
+                Console.WriteLine(response);
         
             }
         }
 
         public static string GetToolLenght(short toolGroup, short toolNumb) {
-            Focas1.cnc_rd1length(_handle, toolGroup, toolNumb).data;
-            string connectionString = "server=(local)\SQLExpress;database=Northwind;integrated Security=SSPI;";
-            
-            string query = "SELECT TOP 5 * FROM dbo.Customers ORDER BY CustomerID";
-            string query = @"
-            CREATE TABLE MiTabla (
-                Columna1 INT PRIMARY KEY,
-                Columna2 VARCHAR(255) NOT NULL,
-                Columna3 DATE
-            );";
-            SqlConnection _con = new SqlConnection(connectionString);
-            //databaseQuery(connectionString, query);
+
+            ODBTLIFE4 toolObject = null;
+            Focas1.cnc_rd1length(_handle, toolGroup, toolNumb, toolObject);
+            string connectionString = "server=NOMBREDELSERVIDOR; database=NOMBREDELADB; User id=IDDEUSUARIO; Password=CONTRASEÑA";
+            string query = string.Format("INSERT INTO NOMBREDETABLA (ToolNumber, ToolLenght) values ({1}, {2})", toolNumb, toolObject.data);
+
+            SqlConnection _con;
+            try
+            {
+                 _con = new SqlConnection(connectionString);
+            }catch (Exception e)
+            {
+                return "Error: No se pudo conectar a la base de datos" + e;
+            }
+
+            if (existTable(_con) == 1)
+            {
+                Console.WriteLine("La tabla existe");
+            }
+            else
+            {
+                string newQuery = @"
+                    CREATE TABLE MiTabla (
+                        Id INT PRIMARY KEY,
+                        ToolNumber INT NOT NULL,
+                        ToolLenght FLOAT NOT NULL
+                        Date DATE
+                    );";
+                databaseQuery(_con, newQuery);
+            }
+
+            int response = databaseQuery(_con, query);
+            if(response == 1)
+            {
+                return "Se efectuo la query exitosamente. Response code: " + response;
+            }
+            return "Error: Ocurrió un error al insetar los datos en la tabla. Response code: " + response;
             
         }
 
-        private static databaseQuery(string connection, string query)
+        private static int databaseQuery(SqlConnection _con, string query)
         {
-            
-                    private static void databaseQuery(string connection, string query)
+            using (SqlCommand _cmd = new SqlCommand(query, _con))
             {
-                using (SqlConnection _con = new SqlConnection(connection))
-                using (SqlCommand _cmd = new SqlCommand(query, _con))
-                {
-                    _con.Open();
-                    _cmd.ExecuteNonQuery();
-                    _con.Close();
-                }
+                _con.Open();
+                int response = _cmd.ExecuteNonQuery();
+                _con.Close();
+                return response;
             }
-            using (SqlConnection _con = new SqlConnection(connection))
-                
-                using (SqlCommand _cmd = new SqlCommand(query, _con))
-                {
-                    DataTable customerTable = new DataTable("Top5Customers");
+        }
+ 
 
-                    SqlDataAdapter _dap = new SqlDataAdapter(_cmd);
-
-                    _con.Open();
-                    _dap.Fill(customerTable);
-                    _con.Close();
-
-                }
-            }
-        
-    }
+    private static int existTable(SqlConnection connection)
+    {
+        using (connection)
+        {
+                SqlCommand _cmd = new SqlCommand("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nombre_de_la_base_de_datos'\r\nAND table_name = 'nombre_de_la_tabla';");
+                int result = _cmd.ExecuteNonQuery();
+                return result;
+        }
+    } 
 
     private static void ExitCheck()
         {
@@ -191,52 +210,5 @@ namespace FanucFocasTutorial1
                 default: { return "UNAVAILABLE"; }
             }
         }
-        /*public static string GetProgramName()
-        {
-            if (_handle == 0)
-            {
-                return "UNAVAILABLE";
-            }
-
-            Focas1.ODBEXEPRG rdProg = new Focas1.ODBEXEPRG();
-
-            _ret = Focas1.cnc_exeprgname(_handle, rdProg);
-
-            if (_ret != Focas1.EW_OK)
-                return _ret.ToString();
-            return new string(rdProg.name).Trim('\0');
-        }
-        public static int GetPartCount()
-        {
-            Focas1.IODBPSD_1 partcount = new Focas1.IODBPSD_1();
-            _ret = Focas1.cnc_rdparam3(_handle, 6711, 0, 8, 0, partcount);
-            if (_ret != Focas1.EW_OK)
-                return 0;
-            return partcount.ldata;
-        }
-
-        
-        public static string GetProgramComment(short _programNumber)
-        {
-            Focas1.PRGDIR2 dir = new Focas1.PRGDIR2(); // array to hold the program directory information
-            short num = 1; // How much programs to be read
-
-            short ret = Focas1.cnc_rdprogdir2(_handle, 1, ref _programNumber, ref num, dir);
-
-            if (ret != Focas1.EW_OK)
-            {
-                throw new Exception($"Cannot retrieve data about the program directory. Error {ret}");
-            }
-            else
-            {
-                // Convert the character array to a string
-                StringBuilder commentBuilder = new StringBuilder();
-                for (int i = 0; i < dir.dir1.comment.Length && dir.dir1.comment[i] != '\0'; i++)
-                {
-                    commentBuilder.Append(dir.dir1.comment[i]);
-                }
-                return commentBuilder.ToString();
-            }
-        }*/
     }
 }
