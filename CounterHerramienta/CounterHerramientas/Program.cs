@@ -16,9 +16,6 @@ namespace FanucFocasTutorial1
     {
         static ushort _handle = 0;
         static short _ret = 0;
-        static int len, fileLen;
-        static int startPos = 0;
-        static string messg;
         static bool _exit = false;
 
         static void Main(string[] args)
@@ -49,24 +46,18 @@ namespace FanucFocasTutorial1
                 string status = GetStatus();
                 Console.WriteLine($"\n\nStatus is: {status}\n\n");
 
-                /*int partcount = GetPartCount();
-                Console.WriteLine($"\n\nPart Count is: {partcount}\n\n");*/
-
-                //Ejecuta la función para descargar un NC al CNC
                 short toolGroup = 1; //Cambiar por el numero del grupo de herramienta que se quiere leer
-                short toolNumb = 1; //Cambiar por el numero de la herramienta que sse quiere leer
-                string response = GetToolLenght(toolGroup, toolNumb);
+                string response = GetToolCount(toolGroup);
                 Console.WriteLine(response);
-        
             }
         }
 
-        public static string GetToolLenght(short toolGroup, short toolNumb) {
+        public static string GetToolCount(short toolGroup) {
 
-            ODBTLIFE4 toolObject = null;
-            Focas1.cnc_rd1length(_handle, toolGroup, toolNumb, toolObject);
+            ODBTLIFE3 toolObject = null;
+            Focas1.cnc_rdcount(_handle, toolGroup, toolObject);
             string connectionString = "server=NOMBREDELSERVIDOR; database=NOMBREDELADB; User id=IDDEUSUARIO; Password=CONTRASEÑA";
-            string query = string.Format("INSERT INTO NOMBREDETABLA (ToolNumber, ToolLenght) values ({1}, {2})", toolNumb, toolObject.data);
+            string query = string.Format("INSERT INTO NOMBREDETABLA (ToolGroup, ToolCount) values ({0}, {1})", toolGroup, toolObject.data);
 
             SqlConnection _con;
             try
@@ -77,7 +68,7 @@ namespace FanucFocasTutorial1
                 return "Error: No se pudo conectar a la base de datos" + e;
             }
 
-            if (existTable(_con) == 1)
+            if (ExistTable(_con) == 1)
             {
                 Console.WriteLine("La tabla existe");
             }
@@ -86,14 +77,14 @@ namespace FanucFocasTutorial1
                 string newQuery = @"
                     CREATE TABLE MiTabla (
                         Id INT PRIMARY KEY,
-                        ToolNumber INT NOT NULL,
-                        ToolLenght FLOAT NOT NULL
+                        ToolGroup INT NOT NULL,
+                        ToolCount FLOAT NOT NULL
                         Date DATE
                     );";
-                databaseQuery(_con, newQuery);
+                DatabaseQuery(_con, newQuery);
             }
 
-            int response = databaseQuery(_con, query);
+            int response = DatabaseQuery(_con, query);
             if(response == 1)
             {
                 return "Se efectuo la query exitosamente. Response code: " + response;
@@ -102,7 +93,7 @@ namespace FanucFocasTutorial1
             
         }
 
-        private static int databaseQuery(SqlConnection _con, string query)
+        private static int DatabaseQuery(SqlConnection _con, string query)
         {
             using (SqlCommand _cmd = new SqlCommand(query, _con))
             {
@@ -114,7 +105,7 @@ namespace FanucFocasTutorial1
         }
  
 
-    private static int existTable(SqlConnection connection)
+    private static int ExistTable(SqlConnection connection)
     {
         using (connection)
         {
