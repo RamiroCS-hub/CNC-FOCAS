@@ -36,8 +36,6 @@ namespace FanucFocasTutorial1
                     return;
                 }
                 string ipAddress = args[0];
-                string fileName = args[1];
-                string programName = args[2];
 
                 Thread t = new Thread(new ThreadStart(ExitCheck));
                 t.Start();
@@ -58,13 +56,11 @@ namespace FanucFocasTutorial1
                 else
                 {
                     //Ejecuta la función para descargar archivos desde el CNC
-                    StringBuilder file = new StringBuilder();
-                    file.Append("R:\\20. Digital\\CNC");
-                    file.Append(fileName);
-                    string filePath = file.ToString();
-                    string lastProgramPath = "" // Path donde se va a guardar el programa mas nuevo del torno
+                    string filePath = "" // Path donde se van a guardar todos los programas del torno (Incluír nombre del archivo)
+                    string lastProgramPath = "" // Path donde se va a guardar el programa mas nuevo del torno (Incluír nombre del archivo)
+                    string programsPath = "" // Path de la carpeta donde están los archivos del CNC
 
-                    string messg = downloadFromCNC(programName, filePath);
+                    string messg = downloadFromCNC(programsPath, filePath);
 
                     if (!downloadOrNot.Contains("error"))
                     {
@@ -195,73 +191,6 @@ namespace FanucFocasTutorial1
                 }
                 return $"{messg}. {_ret}";
             }
-
-            public static string GetToolLenght(short toolGroup, short toolNumb)
-            {
-
-                ODBTLIFE4 toolObject = null;
-                Focas1.cnc_rd1length(_handle, toolGroup, toolNumb, toolObject);
-                string connectionString = "server=NOMBREDELSERVIDOR; database=NOMBREDELADB; User id=IDDEUSUARIO; Password=CONTRASEÑA";
-                string query = string.Format("INSERT INTO NOMBREDETABLA (ToolNumber, ToolLenght) values ({1}, {2})", toolNumb, toolObject.data);
-
-                SqlConnection _con;
-                try
-                {
-                    _con = new SqlConnection(connectionString);
-                }
-                catch (Exception e)
-                {
-                    return "Error: No se pudo conectar a la base de datos" + e;
-                }
-
-                if (existTable(_con) == 1)
-                {
-                    Console.WriteLine("La tabla existe");
-                }
-                else
-                {
-                    string newQuery = @"
-                    CREATE TABLE MiTabla (
-                        Id INT PRIMARY KEY,
-                        Program VARCHAR(255),
-                        Date DATE
-                    );";
-                    databaseQuery(_con, newQuery);
-                }
-
-                int response = databaseQuery(_con, query);
-                if (response == 1)
-                {
-                    return "Se efectuo la query exitosamente. Response code: " + response;
-                }
-                return "Error: Ocurrió un error al insetar los datos en la tabla. Response code: " + response;
-
-            }
-
-            private static int databaseQuery(SqlConnection _con, string query)
-            {
-                using (SqlCommand _cmd = new SqlCommand(query, _con))
-                {
-                    _con.Open();
-                    int response = _cmd.ExecuteNonQuery();
-                    _con.Close();
-                    return response;
-                }
-            }
-
-
-            private static int existTable(SqlConnection connection)
-            {
-                using (connection)
-                {
-                    SqlCommand _cmd = new SqlCommand("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nombre_de_la_base_de_datos'\r\nAND table_name = 'nombre_de_la_tabla';");
-                    int result = _cmd.ExecuteNonQuery();
-                    return result;
-                }
-            }
-
-
-
 
             private static void ExitCheck()
             {
