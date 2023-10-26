@@ -90,6 +90,9 @@ namespace FanucFocasTutorial1
                         sw.WriteLine(line);
                     }
                 } while (sr.EndOfStream);
+
+                sw.Close();
+                sr.Close();
                 return "Success: The last program was successfuly write";
             }
             catch (Exception e)
@@ -116,11 +119,13 @@ namespace FanucFocasTutorial1
                     }
 
                 } while (sr.EndOfStream);
+                sr.Close();
 
                 return cantPrograms++;
             }
             catch (Exception e)
             {
+                Console.WriteLine($"El error fue:{e}");
                 return 0;
             }
         }
@@ -176,6 +181,8 @@ namespace FanucFocasTutorial1
                 }
                 Array.Clear(buff, 0, buff.Length); //Como lo descargado ya se guardo en un archivo se borra todo y se empieza a descargar lo siguiente
             } while (contr);
+
+            sw.Close();
 
 
             _ret = Focas1.cnc_upend4(_handle);
