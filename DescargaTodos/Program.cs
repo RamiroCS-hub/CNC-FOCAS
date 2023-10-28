@@ -74,7 +74,7 @@ namespace FanucFocasTutorial1
             {
                 int actualProgram = 0;
                 string line;
-                StreamReader sr = new StreamReader(filePath);
+                StreamReader sr = new StreamReader(filePath, System.Text.UTF8Encoding);
                 StreamWriter sw = new StreamWriter(lastProgramPath);
 
                 do
