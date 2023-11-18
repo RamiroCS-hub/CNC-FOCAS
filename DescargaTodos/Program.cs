@@ -18,19 +18,18 @@ namespace FanucFocasTutorial1
         static short _ret = 0;
         static bool _exit = false;
 
-        //Ejecuta la función para descargar archivos desde el CNC
-        string filePath = ""; // Path donde se van a guardar todos los programas del torno (Incluír nombre del archivo)
-        string lastProgramPath = ""; // Path donde se va a guardar el programa mas nuevo del torno (Incluír nombre del archivo)
-        string programsPath = ""; // Path de la carpeta donde están los archivos del CNC
-
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+            if (args.Length < 4)
             {
-                Console.WriteLine("Usage: FanucFocasTutorial1.exe <IP_ADDRESS> <FILENAME> <PROGRAMNAME>");
+                Console.WriteLine("Usage: FanucFocasTutorial1.exe <IP_ADDRESS> <PROGRAMSPATH> <FILEPATH> <LASTPROGRAMPATH>");
                 return;
             }
+            //Ejecuta la función para descargar archivos desde el CNC
             string ipAddress = args[0];
+            string programsPath = args[1]; // Path de la carpeta donde están los archivos del 
+            string filePath = args[2]; // Path donde se van a guardar todos los programas del torno (Incluír nombre del archivo)
+            string lastProgramPath = args[3]; // Path donde se va a guardar el programa mas nuevo del torno (Incluír nombre del archivo)
 
             Thread t = new Thread(new ThreadStart(ExitCheck));
             t.Start();
@@ -51,12 +50,12 @@ namespace FanucFocasTutorial1
             else
             {   
 
-                string messg = downloadFromCNC();
+                string messg = downloadFromCNC(programsPath, filePath);
 
                 if (!messg.Contains("error"))
                 {
                     Console.WriteLine($"{messg}");
-                    messg = getLastProgram();
+                    messg = getLastProgram(filePath, lastProgramPath);
                     Console.WriteLine(messg);
                 }
                 else
@@ -66,7 +65,7 @@ namespace FanucFocasTutorial1
             }
         }
 
-        static string getLastProgram()
+        static string getLastProgram(string filePath, string lastProgramPath)
         {
             int cantPrograms = getCantPrograms(filePath); // Se fija cuantos programas se descargaron
 
@@ -74,7 +73,7 @@ namespace FanucFocasTutorial1
             {
                 int actualProgram = 0;
                 string line;
-                StreamReader sr = new StreamReader(filePath, System.Text.UTF8Encoding);
+                StreamReader sr = new StreamReader(filePath);
                 StreamWriter sw = new StreamWriter(lastProgramPath);
 
                 do
@@ -129,17 +128,18 @@ namespace FanucFocasTutorial1
             }
         }
 
-        static string downloadFromCNC()
+        static string downloadFromCNC(string programsPath, string filePath)
         {
             int lenLastWrite = 0;
             Boolean contr = true;
             StreamWriter sw = new StreamWriter(filePath); //Crea el archivo que va a escribir
             short typeOfData = 0; // Defino que se van a descargar archivos NC
+            string messg = "";
+            int len;
 
             if (_handle == 0)
             {
-                messg = ("Error: Handle do not exist");
-                return "";
+                return "Error: Handle do not exist";
             }
 
             const short BUFFSIZE = 1024;
@@ -170,7 +170,7 @@ namespace FanucFocasTutorial1
                     }
                     catch (Exception ex)
                     {
-                       Console.WriteLine("Error: Ocurrió un error al escribir el archivo");
+                       messg = ex.Message;
                     }
 
                     lenLastWrite = len;
@@ -204,5 +204,4 @@ namespace FanucFocasTutorial1
             _exit = true;
         }
     }
-}
 }

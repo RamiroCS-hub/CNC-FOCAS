@@ -13,3 +13,10 @@ C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\C
 C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\Connecting.csproj.CoreCompileInputs.cache
 C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\FocasReceiver.exe
 C:\Users\ramir\Desktop\Programacion\CNC_Focas\RecibidordeProgramas\obj\Release\FocasReceiver.pdb
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\obj\Release\Connecting.csproj.AssemblyReference.cache
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\obj\Release\Connecting.csproj.CoreCompileInputs.cache
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\bin\Release\DescargarTodos.exe.config
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\bin\Release\DescargarTodos.exe
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\bin\Release\DescargarTodos.pdb
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\obj\Release\DescargarTodos.exe
+C:\Users\ramir\Desktop\Programacion\CNC_Focas\DescargaTodos\obj\Release\DescargarTodos.pdb
