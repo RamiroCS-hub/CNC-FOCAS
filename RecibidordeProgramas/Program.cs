@@ -114,14 +114,14 @@ namespace FanucFocasTutorial1
                     byte[] dataToWrite = Encoding.UTF8.GetBytes(new string(buff, 0, len)); // Convert char[] to bytes
 
                     try{
-                        sw.WriteLine(dataToWrite)
+                        sw.WriteLine(dataToWrite);
                     }
 
                     lenLastWrite = len;
                 }
                 if (buff[len - 1] == '%') //Si el último caracter es '%' significa que ya leyó todo el archivo
                 {
-                    contr = false
+                    contr = false;
                     break;
                 }
                 Array.Clear(buff, 0, buff.Length); //Como lo descargado ya se guardo en un archivo se borra todo y se empieza a descargar lo siguiente
