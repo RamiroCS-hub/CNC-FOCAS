@@ -20,16 +20,16 @@ namespace FanucFocasTutorial1
 
         static void Main(string[] args)
         {
-            if (args.Length < 4)
+            if (args.Length < 3)
             {
-                Console.WriteLine("Usage: FanucFocasTutorial1.exe <IP_ADDRESS> <PROGRAMSPATH> <FILEPATH> <LASTPROGRAMPATH>");
+                Console.WriteLine("Usage: FanucFocasTutorial1.exe <IP_ADDRESS> <FILEPATH> <LASTPROGRAMPATH>");
                 return;
             }
             //Ejecuta la función para descargar archivos desde el CNC
             string ipAddress = args[0];
-            string programsPath = args[1]; // Path de la carpeta donde están los archivos del 
-            string filePath = args[2]; // Path donde se van a guardar todos los programas del torno (Incluír nombre del archivo)
-            string lastProgramPath = args[3]; // Path donde se va a guardar el programa mas nuevo del torno (Incluír nombre del archivo)
+            string programsPath = "//CNC_MEM/"; // Path de la carpeta donde están los archivos del 
+            string filePath = args[1]; // Path donde se van a guardar todos los programas del torno (Incluír nombre del archivo)
+            string lastProgramPath = args[2]; // Path donde se va a guardar el programa mas nuevo del torno (Incluír nombre del archivo)
 
             Thread t = new Thread(new ThreadStart(ExitCheck));
             t.Start();
@@ -50,12 +50,12 @@ namespace FanucFocasTutorial1
             else
             {   
 
-                string messg = downloadFromCNC(programsPath, filePath);
+                string messg = DownloadFromCNC(programsPath, filePath);
 
-                if (!messg.Contains("error"))
+                if (!messg.Contains("Error"))
                 {
                     Console.WriteLine($"{messg}");
-                    messg = getLastProgram(filePath, lastProgramPath);
+                    messg = GetLastProgram(filePath, lastProgramPath);
                     Console.WriteLine(messg);
                 }
                 else
@@ -65,9 +65,9 @@ namespace FanucFocasTutorial1
             }
         }
 
-        static string getLastProgram(string filePath, string lastProgramPath)
+        static string GetLastProgram(string filePath, string lastProgramPath)
         {
-            int cantPrograms = getCantPrograms(filePath); // Se fija cuantos programas se descargaron
+            int cantPrograms = GetCantPrograms(filePath); // Se fija cuantos programas se descargaron
 
             try
             {
@@ -100,7 +100,7 @@ namespace FanucFocasTutorial1
 
         }
 
-        static int getCantPrograms(string filePath)
+        private static int GetCantPrograms(string filePath)
         {
             try
             {
@@ -128,11 +128,11 @@ namespace FanucFocasTutorial1
             }
         }
 
-        static string downloadFromCNC(string programsPath, string filePath)
+        private static string DownloadFromCNC(string programsPath, string filePath)
         {
             int lenLastWrite = 0;
-            Boolean contr = true;
-            StreamWriter sw = new StreamWriter(filePath); //Crea el archivo que va a escribir
+            bool contr = true;
+            
             short typeOfData = 0; // Defino que se van a descargar archivos NC
             string messg = "";
             int len;
@@ -146,7 +146,13 @@ namespace FanucFocasTutorial1
             char[] buff = new char[BUFFSIZE + 1]; //Variable donde se va a guardar el archivo que se esta descargando
 
             _ret = Focas1.cnc_upstart4(_handle, typeOfData, programsPath);
-            if (_ret != Focas1.EW_OK) return $"Error: the _ret was:{_ret}";
+            if (_ret != Focas1.EW_OK)
+            {
+                Focas1.ODBERR erroObj = new Focas1.ODBERR();
+                Focas1.cnc_getdtailerr(_handle, erroObj);
+                Console.WriteLine($"Detailed error: {erroObj.err_no}, {erroObj.err_dtno}");
+                return $"Error: the _ret was:{_ret}";
+            }
 
             do
             {
@@ -162,15 +168,17 @@ namespace FanucFocasTutorial1
                 if (_ret == (short)Focas1.focas_ret.EW_OK)
                 {
                     buff[len] = '\0'; //En la ultima posición de lo descargado se coloca '\0' señalizando el final del String leído
-                    byte[] dataToWrite = Encoding.UTF8.GetBytes(new string(buff, 0, len)); // Convert char[] to bytes
+                    string dataToWrite = ""; // Convert char[] to string
+                    for (int i = 0; i < len; i++)
+                    {
+                        dataToWrite += buff[i];
+                    }
 
-                    try
+                    Console.WriteLine(dataToWrite);
+                    using (StreamWriter sw = new StreamWriter(filePath))
                     {
                         sw.WriteLine(dataToWrite);
-                    }
-                    catch (Exception ex)
-                    {
-                       messg = ex.Message;
+                        sw.Close();
                     }
 
                     lenLastWrite = len;
@@ -182,8 +190,6 @@ namespace FanucFocasTutorial1
                 }
                 Array.Clear(buff, 0, buff.Length); //Como lo descargado ya se guardo en un archivo se borra todo y se empieza a descargar lo siguiente
             } while (contr);
-
-            sw.Close();
 
             _ret = Focas1.cnc_upend4(_handle);
 
